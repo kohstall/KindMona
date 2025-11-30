@@ -1,0 +1,1480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mona – In Memory of the first LLM Powered Humanoid</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    /* Base layout */
+    :root {
+      --bg: #0b0c10;
+      --bg-alt: #11131a;
+      --card: #181b24;
+      --accent: #46a6ff;
+      --accent-soft: rgba(70, 166, 255, 0.1);
+      --text-main: #f5f7fb;
+      --text-muted: #9aa2b5;
+      --border-subtle: #282c3a;
+      --radius-xl: 18px;
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-padding-top: 80px;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #182032 0, #050509 40%);
+      color: var(--text-main);
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 20px 16px 60px;
+    }
+
+    /* Header / nav */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: linear-gradient(
+        to bottom,
+        rgba(5, 8, 15, 0.95),
+        rgba(5, 8, 15, 0.8),
+        transparent
+      );
+      margin-bottom: 22px;
+    }
+
+    .nav-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 12px 16px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .brand-pill {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #ffffff, #46a6ff 45%, #182032 100%);
+      box-shadow: 0 0 40px rgba(70, 166, 255, 0.8);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav-links a {
+      padding: 6px 11px;
+      border-radius: 999px;
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: all 0.18s ease-out;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+      border-color: var(--accent-soft);
+      background: radial-gradient(circle at top left, #19253a, transparent);
+    }
+
+    .nav-links a.primary {
+      border-color: var(--accent);
+      background: radial-gradient(circle at top left, #1d3e63, #101725);
+      color: var(--text-main);
+    }
+
+    /* Hero / intro */
+    .hero {
+      margin-top: 12px;
+      margin-bottom: 26px;
+    }
+
+
+    .hero-text h1 {
+      font-size: clamp(26px, 3vw, 32px);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero-text h1 span {
+      color: var(--accent);
+    }
+
+    .hero-text p {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 36rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .hero-meta span {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(24, 27, 36, 0.9);
+      border: 1px solid rgba(54, 61, 82, 0.8);
+    }
+
+    .hero-card {
+      border-radius: 22px;
+      padding: 14px 14px 16px;
+      background: radial-gradient(circle at 20% 0, #253652, #050509 70%);
+      border: 1px solid rgba(67, 80, 110, 0.7);
+      box-shadow: var(--shadow-soft);
+      margin: 20px 0;
+      max-width: 500px;
+    }
+
+    .hero-card h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+    }
+
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .hero-metric {
+      background: rgba(9, 12, 21, 0.94);
+      border-radius: 14px;
+      border: 1px solid rgba(51, 61, 84, 0.9);
+      padding: 10px 10px 9px;
+      font-size: 11px;
+    }
+
+    .hero-metric-label {
+      color: var(--text-muted);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .hero-metric-value {
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .hero-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-metrics {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+      }
+    }
+
+    /* Sections */
+    section {
+      margin-bottom: 34px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Timeline */
+    .timeline {
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(
+        135deg,
+        rgba(18, 23, 36, 0.98),
+        rgba(10, 11, 18, 0.98)
+      );
+      padding: 14px 14px 10px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .timeline-inner {
+      border-left: 1px dashed rgba(90, 105, 140, 0.8);
+      margin-left: 24px;
+      padding-left: 20px;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .timeline-item:last-of-type {
+      margin-bottom: 8px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 16px rgba(70, 166, 255, 0.9);
+    }
+
+    .timeline-date {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 4px;
+    }
+
+    .timeline-title {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-description {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      max-width: 38rem;
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 */
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(60, 72, 104, 0.9);
+      background: radial-gradient(circle at top, #1a2236, #050509);
+    }
+
+    .video-wrapper iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-wrapper::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 12, 20, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .video-wrapper.error::after {
+      content: "Video unavailable - Click to watch on YouTube";
+      opacity: 1;
+      pointer-events: all;
+      cursor: pointer;
+    }
+
+    .timeline-image {
+      width: 100%;
+      max-width: 600px;
+      border-radius: 14px;
+      margin: 8px 0;
+      border: 1px solid var(--border-subtle);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .timeline-image:hover {
+      border-color: var(--accent-soft);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .funding-images {
+      display: flex;
+      gap: 12px;
+      margin: 8px 0;
+      flex-wrap: wrap;
+    }
+
+    .funding-image {
+      max-width: 140px;
+      height: 60px;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 8px;
+    }
+
+    .press-image {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      float: left;
+      margin-right: 10px;
+      margin-bottom: 6px;
+    }
+
+    /* Press Frame */
+    .press-frame {
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, #1b2436, #050509 60%);
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card {
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(9, 11, 18, 0.96);
+      padding: 10px 11px;
+      font-size: 12px;
+      overflow: hidden;
+    }
+
+    .tags {
+      margin-top: 6px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .tag {
+      padding: 3px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(82, 97, 133, 0.9);
+      background: rgba(8, 10, 18, 0.95);
+      color: var(--text-muted);
+    }
+
+    /* Spec sheet */
+    .spec-card {
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      background: radial-gradient(circle at top left, #1b2436, #050509 60%);
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .spec-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .table-wrapper {
+      max-height: none;
+      overflow: visible;
+      border-radius: 14px;
+      border: 1px solid rgba(52, 62, 86, 0.9);
+      background: rgba(9, 11, 18, 0.98);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 420px;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(
+        to right,
+        rgba(13, 17, 26, 0.98),
+        rgba(18, 22, 33, 0.98)
+      );
+      z-index: 1;
+    }
+
+    th,
+    td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(36, 43, 61, 0.95);
+      text-align: left;
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(11, 14, 22, 0.9);
+    }
+
+    tbody tr:hover {
+      background: rgba(27, 34, 52, 0.95);
+    }
+
+    .spec-name {
+      font-weight: 500;
+    }
+
+    .spec-group {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(36, 43, 61, 0.95);
+      padding-top: 6px;
+      margin-top: 6px;
+    }
+
+    /* Press & other cards */
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+
+    .card {
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(9, 11, 18, 0.96);
+      padding: 10px 11px;
+      font-size: 12px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .card-link {
+      font-size: 11px;
+      color: var(--accent);
+      word-break: break-word;
+    }
+
+    .bullet-list {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding-left: 17px;
+    }
+
+    .bullet-list li {
+      margin-bottom: 4px;
+    }
+
+    /* Gallery Frame */
+    .gallery-frame {
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(
+        135deg,
+        rgba(18, 23, 36, 0.98),
+        rgba(10, 11, 18, 0.98)
+      );
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    /* Gallery Carousel */
+    .gallery-carousel {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: rgba(9, 11, 18, 0.96);
+    }
+
+    .gallery-main-image {
+      width: 100%;
+      height: 600px;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.5s ease;
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+
+    .gallery-nav:hover {
+      background: rgba(0, 0, 0, 0.9);
+      border-color: var(--accent);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .gallery-nav-left {
+      left: 15px;
+    }
+
+    .gallery-nav-right {
+      right: 15px;
+    }
+
+    .gallery-nav::before {
+      content: '';
+      width: 0;
+      height: 0;
+      border-style: solid;
+    }
+
+    .gallery-nav-left::before {
+      border-width: 8px 12px 8px 0;
+      border-color: transparent var(--text-main) transparent transparent;
+    }
+
+    .gallery-nav-right::before {
+      border-width: 8px 0 8px 12px;
+      border-color: transparent transparent transparent var(--text-main);
+    }
+
+    .gallery-caption-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(rgba(0, 0, 0, 0.8), transparent);
+      padding: 15px 20px 20px;
+      color: var(--text-main);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .gallery-indicators {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .gallery-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .gallery-indicator.active {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
+
+    .gallery-counter {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-main);
+      z-index: 10;
+    }
+
+    /* Gallery placeholder */
+    .gallery-placeholder {
+      border-radius: var(--radius-xl);
+      border: 1px dashed rgba(88, 102, 136, 0.9);
+      background: rgba(10, 12, 20, 0.96);
+      padding: 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    footer {
+      margin-top: 32px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="brand-pill"></div>
+        <span>In memory of Mona</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#story">Story</a>
+        <a href="#timeline">Timeline</a>
+        <a href="#specs">Specs</a>
+        <a href="#press">Press</a>
+        <a href="#applications">Applications</a>
+        <a href="#gallery">Gallery</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <!-- Intro / hero -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1><span>Mona</span> – the Kind Humanoid</h1>
+        
+        <div class="hero-card">
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <div class="hero-metric-label">Robot</div>
+              <div class="hero-metric-value">Mona</div>
+            </div>
+            <div class="hero-metric">
+              <div class="hero-metric-label">Company</div>
+              <div class="hero-metric-value">Kind Humanoid</div>
+            </div>
+            <div class="hero-metric">
+              <div class="hero-metric-label">Creator</div>
+              <div class="hero-metric-value"><a href="https://www.linkedin.com/in/christophkohstall/" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none;">Christoph Kohstall</a></div>
+            </div>
+            <div class="hero-metric">
+              <div class="hero-metric-label">Acquired by</div>
+              <div class="hero-metric-value"><a href="https://www.1x.tech" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none;">1X</a></div>
+            </div>
+          </div>
+        </div>
+
+        <p>
+          Mona was the first LLM powered humanoid. It was created by <a href="https://www.linkedin.com/in/christophkohstall/" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none;">Christoph Kohstall</a> and the company that grew around Mona was Kind Humanoid. Kind Humanoid was acquired by <a href="https://www.1x.tech" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: none;">1X</a> in Jan 2025.
+        </p>
+
+        <div class="hero-meta">
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Story section -->
+    <section id="story">
+      <div class="section-header">
+        <h2 class="section-title"></h2>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-inner">
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">2024</div>
+            <h3 class="timeline-title"> The story of Mona</h3>
+            <p class="timeline-description">
+                The founder shares about the background, the making, and the concepts.
+            </p>
+            <div class="video-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/z0w7haUsl7M?rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
+                title="Story of Mona"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            <div class="tags">
+              <span class="tag">Story</span>
+              <span class="tag">Overview</span>
+              <span class="tag">Behind the scenes</span>
+              <span class="tag">Applications</span>
+              <span class="tag">Concepts</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline section -->
+    <section id="timeline">
+      <div class="section-header">
+        <h2 class="section-title">Timeline</h2>
+        <p class="section-subtitle">
+          Key milestones from balancing to acquisition.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-inner">
+          <!-- 1/2025 company acquired -->
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">01 / 2025</div>
+            <h3 class="timeline-title">Kind Humanoid acquired by 1X</h3>
+            <p class="timeline-description">
+                "The relationship between the two newly joined companies is built on the foundational belief that humanoids need to be developed alongside humans — living and learning among us."
+            </p>
+            <a href="https://techcrunch.com/2025/01/27/openai-backed-1x-acquires-kind-humanoid/" target="_blank" rel="noopener noreferrer">
+              <img src="assets/images/1x-acquires-kind-humanoid.png" alt="1X acquires Kind Humanoid announcement" class="timeline-image">
+            </a>
+            <p class="timeline-description" style="margin-top:6px;">
+                <a href="https://techcrunch.com/2025/01/27/openai-backed-1x-acquires-kind-humanoid/" target="_blank" rel="noopener noreferrer">
+                    Read about acquisition announcement on TechCrunch
+                </a>
+            </p>
+            <div class="tags">
+              <span class="tag">Company</span>
+              <span class="tag">Acquisition</span>
+            </div>
+          </article>
+
+          <!-- 11/2024 Kind at TED -->
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">11 / 2024</div>
+            <h3 class="timeline-title">Yves Béhar and Christoph Kohstall at TED AI</h3>
+            <p class="timeline-description">
+                "We need technologists that really apply tech and AI in a humanistic ways." Yves Béhar
+            </p>
+            <a href="https://tedai-sanfrancisco.ted.com/speakers/christoph-kohstall/" target="_blank" rel="noopener noreferrer">
+              <img src="assets/images/Yves_Behar_Christoph_Kohstall_TED_AI.jpeg" alt="Christoph Kohstall and Yves Béhar at TED AI" class="timeline-image">
+            </a>
+            <p class="timeline-description">
+              <a href="https://tedai-sanfrancisco.ted.com/speakers/christoph-kohstall/" target="_blank" rel="noopener noreferrer">
+                Watch the talk on TED AI 
+              </a>
+            </p>
+            <div class="tags">
+              <span class="tag">Talk</span>
+              <span class="tag">TED</span>
+            </div>
+          </article>
+
+          <!-- 09/2023 walking (YouTube shorts) -->
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">09 / 2023</div>
+            <h3 class="timeline-title">Mona takes its first steps</h3>
+            <p class="timeline-description">
+              "I saw in a newsetter that there will be a conference on walking robots in Brazil - I really wanted to go - 6 days (and nights) later Mona took her first steps."
+            </p>
+            <div class="video-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/M5GyAMYafLg?rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
+                title="Mona walking demo"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            <div class="tags">
+              <span class="tag">Walking</span>
+              <span class="tag">First steps</span>
+              <span class="tag">Locomotion</span>
+            </div>
+          </article>
+
+          <!-- 04/2023 company funded -->
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">04 / 2023</div>
+            <h3 class="timeline-title">Kind Humanoid gets funded</h3>
+            <div class="funding-images">
+              <img src="assets/images/khosla.jpeg" alt="Khosla Ventures" class="funding-image">
+              <img src="assets/images/samsung_Next.jpeg" alt="Samsung Next" class="funding-image">
+            </div>
+            <div class="tags">
+              <span class="tag">Funding</span>
+              <span class="tag">Venture Capital</span>
+              <span class="tag">Khosla Ventures</span>
+              <span class="tag">Samsung Next</span>
+            </div>
+          </article>
+
+          <!-- 12/2022 language based action (YouTube) -->
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">12 / 2022</div>
+            <h3 class="timeline-title">LLM and vision based actions in the real world</h3>
+            <p class="timeline-description">
+              Just 13 days after the release of ChatGPT, Mona became the first humanoid embodied LLM. See at 1:21 what happens when I tell Mona "I'm thirsty".
+            </p>
+            <div class="video-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/xZ7ROSxcako?rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
+                title="Language based action"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            <div class="tags">
+              <span class="tag">LLM</span>
+              <span class="tag">embodied AI</span>
+            </div>
+          </article>
+
+          <!-- 06/2022 balancing -->
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">06 / 2022</div>
+            <h3 class="timeline-title">Mona balances</h3>
+            <div class="tags">
+              <span class="tag">Balancing</span>
+              <span class="tag">Dynamics</span>
+              <span class="tag">Control</span>
+              <span class="tag">NN based kinematics</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Specs section -->
+    <section id="specs">
+      <div class="section-header">
+        <h2 class="section-title">Specification</h2>
+      </div>
+
+      <div class="spec-card">
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30%;">Parameter</th>
+                <th style="width: 25%; text-align: right;">Value</th>
+                <th style="width: 20%;">Units</th>
+                <th style="width: 25%;">Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- PHYSICAL -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Physical</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Height</td>
+                <td style="text-align: right;">183</td>
+                <td>cm</td>
+                <td>Same as creator 🙂</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Weight</td>
+                <td style="text-align: right;">29</td>
+                <td>kg</td>
+                <td>Total with battery</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Weight (normalized)</td>
+                <td style="text-align: right;">23</td>
+                <td>kg</td>
+                <td>Normalized to 165&nbsp;cm</td>
+              </tr>
+
+              <!-- DOF -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Degrees of Freedom</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Arm + clavicle</td>
+                <td style="text-align: right;">9×2</td>
+                <td>DOF</td>
+                <td>Per arm</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Torso</td>
+                <td style="text-align: right;">3</td>
+                <td>DOF</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Leg + toe</td>
+                <td style="text-align: right;">8×2</td>
+                <td>DOF</td>
+                <td>Per leg</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Eyes gimbal</td>
+                <td style="text-align: right;">4</td>
+                <td>DOF</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Hand</td>
+                <td style="text-align: right;">6</td>
+                <td>DOF</td>
+                <td>left hand only</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Total DOF</td>
+                <td style="text-align: right;">47</td>
+                <td>DOF</td>
+                <td>&nbsp;</td>
+              </tr>
+
+              <!-- BRAIN & COMPUTE -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Brain &amp; Compute</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Brain – Intelligence</td>
+                <td style="text-align: right;">GPT 3.5</td>
+                <td>&nbsp;</td>
+                <td>Language model</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Brain – Kinematics</td>
+                <td style="text-align: right;">Neural network based</td>
+                <td>&nbsp;</td>
+                <td>Motion / control representation</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Compute</td>
+                <td style="text-align: right;">Nvidia Orin AGX</td>
+                <td>&nbsp;</td>
+                <td>Main compute</td>
+              </tr>
+
+              <!-- POWER & ENERGY -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Power &amp; Energy</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Total motor power</td>
+                <td style="text-align: right;">47</td>
+                <td>kW</td>
+                <td>Peak</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Battery capacity</td>
+                <td style="text-align: right;">1000</td>
+                <td>Wh</td>
+                <td>&nbsp;</td>
+              </tr>
+
+              <!-- RUNTIME -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Run time</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Standby</td>
+                <td style="text-align: right;">24</td>
+                <td>hours</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Standing</td>
+                <td style="text-align: right;">8</td>
+                <td>hours</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Walking</td>
+                <td style="text-align: right;">5</td>
+                <td>hours</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Working</td>
+                <td style="text-align: right;">3–7</td>
+                <td>hours</td>
+                <td>Depending on task</td>
+              </tr>
+
+              <!-- SENSORS -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Sensors</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Microphones</td>
+                <td style="text-align: right;">Stereo</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Speaker</td>
+                <td style="text-align: right;">Mono</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Cameras</td>
+                <td style="text-align: right;">7</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Torque sensing</td>
+                <td style="text-align: right;">Direct joint torques</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Feet sensing</td>
+                <td style="text-align: right;">4-point force sensing</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+
+              <!-- PERFORMANCE -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Performance</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">Joint strength</td>
+                <td style="text-align: right;">60th percentile male</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Joint speed</td>
+                <td style="text-align: right;">60th percentile male</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+
+              <!-- BUILD & COST -->
+              <tr>
+                <td colspan="4">
+                  <div class="spec-group">Build &amp; Cost</div>
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-name">BOM @ 1 unit</td>
+                <td style="text-align: right;">10&nbsp;000</td>
+                <td>$</td>
+                <td>Bill of materials at one unit</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Robots built</td>
+                <td style="text-align: right;">1</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Dev &amp; build time</td>
+                <td style="text-align: right;">3 years, 1 engineer</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="spec-name">Heat management</td>
+                <td style="text-align: right;">Water cooled</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Press section -->
+    <section id="press">
+      <div class="section-header">
+        <h2 class="section-title">Press</h2>
+      </div>
+
+      <div class="press-frame">
+        <div class="card-list">
+          <div class="card">
+            <img src="assets/images/design.png" alt="Kind Humanoid robot" class="press-image">
+            <div class="card-title">Design collaboration</div>
+            <p class="section-subtitle" style="margin-bottom:4px;">
+              Working with designer Yves Béhar to bring humanoids home.
+            </p>
+            <a
+              class="card-link"
+              href="https://techcrunch.com/2024/10/13/this-three-person-robotics-startup-is-working-with-designer-yves-behar-to-bring-humanoids-home/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              TechCrunch article
+            </a>
+          </div>
+
+          <div class="card">
+            <img src="assets/images/robot.png" alt="Robot design" class="press-image">
+            <div class="card-title">Fast Company</div>
+            <p class="section-subtitle" style="margin-bottom:4px;">
+              "Kind Humanoid wants to be the iPhone of cyborgs."
+            </p>
+            <a
+              class="card-link"
+              href="https://www.fastcompany.com/91203133/kind-humanoid-wants-to-be-the-iphone-of-cyborgs"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              FastCompany article
+            </a>
+          </div>
+
+          <div class="card">
+            <img src="assets/images/olympia.png" alt="1X Olympia robot" class="press-image">
+            <div class="card-title">Acquisition</div>
+            <p class="section-subtitle" style="margin-bottom:4px;">
+              OpenAI-backed 1X acquires Kind Humanoid.
+            </p>
+            <a
+              class="card-link"
+              href="https://techcrunch.com/2025/01/27/openai-backed-1x-acquires-kind-humanoid/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              TechCrunch acquisition article
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Targeted applications section -->
+    <section id="applications">
+      <div class="section-header">
+        <h2 class="section-title">Applications</h2>
+        <p class="section-subtitle">
+          Where Mona wants to assist.
+        </p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-inner">
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">Applications</div>
+            <h3 class="timeline-title">Principle: doing the things humans should do but don’t do</h3>
+            <p class="timeline-description">Additional labor to:</p>
+            <ul class="bullet-list">
+              <li>accelerate the transition to renewable energies</li>
+              <li>provide better and more accessible care</li>
+              <li>build a circular economy</li>
+            </ul>
+          </article>
+
+          <article class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-date">Showcase</div>
+            <h3 class="timeline-title">Medical care</h3>
+            <p class="timeline-description">
+              "Imagine a robot going beyond mundane tasks and assisting humans in ways never possible before"
+            </p>
+            <div class="video-wrapper">
+              <iframe
+                src="https://www.youtube.com/embed/a0ho6sJdyxk?rel=0&modestbranding=1&showinfo=0&enablejsapi=1"
+                title="Application showcase"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            <div class="tags">
+              <span class="tag">Applications</span>
+              <span class="tag">Showcase</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gallery section -->
+    <section id="gallery">
+      <div class="section-header">
+        <h2 class="section-title">Gallery</h2>
+      </div>
+
+      <div class="gallery-frame">
+        <div class="gallery-carousel">
+          <img id="gallery-main-image" src="assets/gallery/PXL_20210429_182531772.jpg" alt="Early robot prototype" class="gallery-main-image">
+          
+          <div class="gallery-nav gallery-nav-left" onclick="previousImage()"></div>
+          <div class="gallery-nav gallery-nav-right" onclick="nextImage()"></div>
+          
+          <div class="gallery-caption-overlay">
+            <span id="gallery-caption">Full Carbon Fiber skeleton</span>
+          </div>
+          
+          <div class="gallery-counter">
+            <span id="gallery-current">1</span> / <span id="gallery-total">17</span>
+          </div>
+          
+          <div class="gallery-indicators">
+            <div class="gallery-indicator active" onclick="goToImage(0)"></div>
+            <div class="gallery-indicator" onclick="goToImage(1)"></div>
+            <div class="gallery-indicator" onclick="goToImage(2)"></div>
+            <div class="gallery-indicator" onclick="goToImage(3)"></div>
+            <div class="gallery-indicator" onclick="goToImage(4)"></div>
+            <div class="gallery-indicator" onclick="goToImage(5)"></div>
+            <div class="gallery-indicator" onclick="goToImage(6)"></div>
+            <div class="gallery-indicator" onclick="goToImage(7)"></div>
+            <div class="gallery-indicator" onclick="goToImage(8)"></div>
+            <div class="gallery-indicator" onclick="goToImage(9)"></div>
+            <div class="gallery-indicator" onclick="goToImage(10)"></div>
+            <div class="gallery-indicator" onclick="goToImage(11)"></div>
+            <div class="gallery-indicator" onclick="goToImage(12)"></div>
+            <div class="gallery-indicator" onclick="goToImage(13)"></div>
+            <div class="gallery-indicator" onclick="goToImage(14)"></div>
+            <div class="gallery-indicator" onclick="goToImage(15)"></div>
+            <div class="gallery-indicator" onclick="goToImage(16)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>Static Mona page – edit <code>index.html</code> to update.</span>
+    </footer>
+  </main>
+
+  <script>
+    // Gallery carousel data and functionality
+    const galleryImages = [
+      { src: 'assets/gallery/PXL_20210429_182531772.jpg', caption: 'Full Carbon Fiber skeleton', alt: 'Early robot prototype' },
+      { src: 'assets/gallery/PXL_20210501_064729781 (1).jpg', caption: 'Motor mount with cooling', alt: 'Workshop setup' },
+      { src: 'assets/gallery/PXL_20210504_190017714.MP.jpg', caption: 'Machining', alt: 'Component testing' },
+      { src: 'assets/gallery/PXL_20210507_020540109.jpg', caption: 'Tendon assembly', alt: 'Assembly process' },
+      { src: 'assets/gallery/PXL_20210514_051549162.jpg', caption: 'Cables like arteries', alt: 'Testing setup' },
+      { src: 'assets/gallery/PXL_20210521_222039130 (3).jpg', caption: 'Bringing together legs and torso', alt: 'Hardware components' },
+      { src: 'assets/gallery/FLIR_20220426_114839.jpg', caption: 'Thermal analysis testing', alt: 'Thermal imaging' },
+      { src: 'assets/gallery/PXL_20230130_194051995_exported_289901.jpg', caption: 'Perception Reasoning and Acting', alt: 'Robot testing' },
+      { src: 'assets/gallery/PXL_20230905_193933040-EDIT (1).jpg', caption: 'Calibrating COM', alt: 'Design iteration' },
+      { src: 'assets/gallery/PXL_20230910_234657036.jpg', caption: 'Christoph style real time diagrams', alt: 'Final assembly' },
+      { src: 'assets/gallery/PXL_20230920_181507061 (2).jpg', caption: 'System monitor', alt: 'System integration' },
+      { src: 'assets/gallery/PXL_20231020_192217431 (1).jpg', caption: 'Brain architecture', alt: 'Performance testing' },
+      { src: 'assets/gallery/PXL_20231021_172735744.jpg', caption: 'At Maker Fair', alt: 'Lab work' },
+      { src: 'assets/gallery/PXL_20240226_030042875~2 (1).jpg', caption: 'One is Mona, one is me', alt: 'Progress milestone' },
+      { src: 'assets/gallery/PXL_20240612_170938699.jpg', caption: 'Perception Reasoning and Acting', alt: 'Testing phase' },
+      { src: 'assets/gallery/PXL_20240814_225840062.MP.jpg', caption: 'Doctor movie', alt: 'Latest development' },
+      { src: 'assets/gallery/Screenshot 2024-10-09 at 10.15.10 AM.png', caption: 'Design by Yves Behar', alt: 'Software interface' }
+    ];
+
+    let currentImageIndex = 0;
+    let galleryInterval;
+
+    function updateGalleryDisplay() {
+      const mainImage = document.getElementById('gallery-main-image');
+      const caption = document.getElementById('gallery-caption');
+      const current = document.getElementById('gallery-current');
+      const indicators = document.querySelectorAll('.gallery-indicator');
+      
+      if (!mainImage) return; // Gallery not loaded yet
+      
+      const currentImage = galleryImages[currentImageIndex];
+      mainImage.src = currentImage.src;
+      mainImage.alt = currentImage.alt;
+      caption.textContent = currentImage.caption;
+      current.textContent = currentImageIndex + 1;
+      
+      // Update indicators
+      indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === currentImageIndex);
+      });
+    }
+
+    function nextImage() {
+      currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+      updateGalleryDisplay();
+      resetAutoAdvance();
+    }
+
+    function previousImage() {
+      currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+      updateGalleryDisplay();
+      resetAutoAdvance();
+    }
+
+    function goToImage(index) {
+      currentImageIndex = index;
+      updateGalleryDisplay();
+      resetAutoAdvance();
+    }
+
+    function startAutoAdvance() {
+      galleryInterval = setInterval(nextImage, 3000); // 2 seconds
+    }
+
+    function stopAutoAdvance() {
+      if (galleryInterval) {
+        clearInterval(galleryInterval);
+        galleryInterval = null;
+      }
+    }
+
+    function resetAutoAdvance() {
+      stopAutoAdvance();
+      startAutoAdvance();
+    }
+
+    // Handle YouTube embed errors and provide fallback
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize gallery if it exists
+      if (document.getElementById('gallery-main-image')) {
+        updateGalleryDisplay();
+        startAutoAdvance();
+        
+        // Pause auto-advance when user hovers over gallery
+        const gallery = document.querySelector('.gallery-carousel');
+        if (gallery) {
+          gallery.addEventListener('mouseenter', stopAutoAdvance);
+          gallery.addEventListener('mouseleave', startAutoAdvance);
+        }
+      }
+
+      // YouTube embed error handling
+      const videoWrappers = document.querySelectorAll('.video-wrapper');
+      
+      videoWrappers.forEach(wrapper => {
+        const iframe = wrapper.querySelector('iframe');
+        if (!iframe) return;
+        
+        // Extract video ID from iframe src
+        const src = iframe.src;
+        const videoId = src.match(/embed\/([^?&]+)/)?.[1];
+        
+        if (!videoId) return;
+        
+        // Create fallback link
+        const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+        
+        // Handle iframe load errors
+        iframe.addEventListener('error', function() {
+          wrapper.classList.add('error');
+          wrapper.style.cursor = 'pointer';
+          wrapper.addEventListener('click', function() {
+            window.open(youtubeUrl, '_blank', 'noopener noreferrer');
+          });
+        });
+        
+        // Fallback timeout for videos that don't load
+        setTimeout(function() {
+          // Check if iframe has loaded content by trying to access its document
+          try {
+            if (!iframe.contentDocument && !iframe.contentWindow) {
+              wrapper.classList.add('error');
+              wrapper.style.cursor = 'pointer';
+              wrapper.addEventListener('click', function() {
+                window.open(youtubeUrl, '_blank', 'noopener noreferrer');
+              });
+            }
+          } catch (e) {
+            // Cross-origin restrictions are normal, this means the video loaded
+          }
+        }, 5000);
+      });
+    });
+
+    // Keyboard navigation for gallery
+    document.addEventListener('keydown', function(event) {
+      if (!document.getElementById('gallery-main-image')) return;
+      
+      if (event.key === 'ArrowLeft') {
+        previousImage();
+        event.preventDefault();
+      } else if (event.key === 'ArrowRight') {
+        nextImage();
+        event.preventDefault();
+      }
+    });
+  </script>
+</body>
+</html>
